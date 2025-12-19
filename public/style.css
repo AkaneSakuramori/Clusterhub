@@ -1,0 +1,32 @@
+body {
+  background: #0e0e0e;
+  color: #eaeaea;
+  font-family: monospace;
+  padding: 20px;
+}
+
+a {
+  color: #4da6ff;
+  text-decoration: none;
+}
+
+input, textarea, button {
+  width: 100%;
+  max-width: 520px;
+  margin: 6px 0;
+  padding: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+button {
+  cursor: pointer;
+}
+
+pre {
+  background: #111;
+  padding: 15px;
+  border: 1px solid #333;
+  white-space: pre-wrap;
+}
