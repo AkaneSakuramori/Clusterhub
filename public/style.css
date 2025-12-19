@@ -1,32 +1,61 @@
 body {
-  background: #0e0e0e;
+  background: #1c1c1c;
   color: #eaeaea;
-  font-family: monospace;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.card {
+  background: #2a2a2a;
+  width: 92%;
+  max-width: 420px;
+  border-radius: 12px;
   padding: 20px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.4);
 }
 
-a {
-  color: #4da6ff;
+.card h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  word-break: break-word;
+}
+
+.meta {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.meta div {
+  margin-bottom: 6px;
+}
+
+.btn {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: 10px;
   text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 14px;
 }
 
-input, textarea, button {
-  width: 100%;
-  max-width: 520px;
-  margin: 6px 0;
-  padding: 8px;
-  background: #1a1a1a;
+.btn.instant {
+  background: #ff3b3b;
   color: #fff;
-  border: 1px solid #333;
+  font-size: 16px;
 }
 
-button {
-  cursor: pointer;
+.btn.instant:hover {
+  background: #ff1f1f;
 }
 
-pre {
-  background: #111;
-  padding: 15px;
-  border: 1px solid #333;
-  white-space: pre-wrap;
+.note {
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: center;
 }
