@@ -1,56 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Add File</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+import express from "express";
+import fs from "fs";
+import { v4 as uuid } from "uuid";
 
-<h2>Add Google Drive File</h2>
+const app = express();
+const PORT = 3000;
+const DB = "./data/files.json";
+const BASE_URL = "http://202.61.196.127:3000";
 
-<form id="f">
-  <input id="title" placeholder="Title" required><br>
-  <input id="size" placeholder="Size (e.g. 4.79GB)"><br>
-  <input id="fileId" placeholder="Google Drive File ID" required><br>
-  <button type="submit">Add</button>
-</form>
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-<pre id="log"></pre>
+function loadDB() {
+  if (!fs.existsSync(DB)) return {};
+  return JSON.parse(fs.readFileSync(DB));
+}
 
-<script>
-const log = document.getElementById("log");
+function saveDB(data) {
+  fs.writeFileSync(DB, JSON.stringify(data, null, 2));
+}
 
-document.getElementById("f").addEventListener("submit", async e => {
-  e.preventDefault();
+/* Add file & generate short link */
+app.post("/api/add", (req, res) => {
+  const { fileId } = req.body;
+  if (!fileId) return res.status(400).json({ error: "Missing fileId" });
 
-  const payload = {
-    title: title.value.trim(),
-    size: size.value.trim(),
-    fileId: fileId.value.trim()
-  };
+  const id = uuid().slice(0, 12);
+  const db = loadDB();
 
-  const res = await fetch("/api/add", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+  db[id] = { id, fileId, created: Date.now() };
+  saveDB(db);
+
+  res.json({
+    short: `${BASE_URL}/download/${id}`
   });
-
-  const text = await res.text();
-
-  try {
-    const data = JSON.parse(text);
-
-    if (!data.page) {
-      log.textContent = "ERROR: No page returned\n\n" + text;
-      return;
-    }
-
-    log.textContent = "SUCCESS\nCreated page:\n" + data.page;
-  } catch (err) {
-    log.textContent = "INVALID RESPONSE\n\n" + text;
-  }
 });
-</script>
 
-</body>
-</html>
+/* Redirect to Drive usercontent URL */
+app.get("/download/:id", (req, res) => {
+  const db = loadDB();
+  const file = db[req.params.id];
+  if (!file) return res.status(404).send("Invalid link");
+
+  const driveUrl =
+    `https://drive.usercontent.google.com/download?id=${file.fileId}` +
+    `&export=download&confirm=t`;
+
+  res.redirect(driveUrl);
+});
+
+app.listen(PORT, () => {
+  console.log(`ClusterHub running on ${BASE_URL}`);
+});
