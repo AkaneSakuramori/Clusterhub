@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add File</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Add CDN File</h2>
+
+<form id="f">
+  <input id="title" placeholder="Title" required><br>
+  <input id="size" placeholder="Size (e.g. 4.79GB)"><br>
+  <textarea id="cdn" placeholder="CDN Download URL" required></textarea><br>
+  <button>Add</button>
+</form>
+
+<script>
+document.getElementById("f").onsubmit = async e => {
+  e.preventDefault();
+
+  const res = await fetch("/api/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: title.value,
+      size: size.value,
+      cdn: cdn.value
+    })
+  });
+
+  const d = await res.json();
+  alert("Created page: " + d.page);
+};
+</script>
+
+</body>
+</html>
