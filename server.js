@@ -5,6 +5,7 @@ import { v4 as uuid } from "uuid";
 const app = express();
 const PORT = 3000;
 const DB = "./data/files.json";
+const BASE_URL = "http://202.61.196.127:3000";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,57 +20,35 @@ function saveDB(data) {
   fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 }
 
-/* Add file */
+/* Add file & generate short link */
 app.post("/api/add", (req, res) => {
-  const { title, size, fileId } = req.body;
-  if (!title || !fileId) {
-    return res.status(400).json({ error: "Missing title or fileId" });
-  }
+  const { fileId } = req.body;
+  if (!fileId) return res.status(400).json({ error: "Missing fileId" });
 
   const id = uuid().slice(0, 12);
   const db = loadDB();
 
-  db[id] = {
-    id,
-    title,
-    size,
-    fileId,
-    created: Date.now()
-  };
-
+  db[id] = { id, fileId, created: Date.now() };
   saveDB(db);
-  res.json({ page: `/file.html?id=${id}` });
+
+  res.json({
+    short: `${BASE_URL}/download/${id}`
+  });
 });
 
-/* Get metadata */
-app.get("/api/file/:id", (req, res) => {
-  const db = loadDB();
-  res.json(db[req.params.id] || null);
-});
-
-/* 🔥 Generate fresh Google CDN URL every click */
-app.get("/download/:id", async (req, res) => {
+/* Redirect to Drive usercontent URL */
+app.get("/download/:id", (req, res) => {
   const db = loadDB();
   const file = db[req.params.id];
-  if (!file) return res.status(404).send("File not found");
+  if (!file) return res.status(404).send("Invalid link");
 
-  const driveUrl = `https://drive.google.com/uc?id=${file.fileId}&export=download`;
+  const driveUrl =
+    `https://drive.usercontent.google.com/download?id=${file.fileId}` +
+    `&export=download&confirm=t`;
 
-  try {
-    const r = await fetch(driveUrl, { redirect: "manual" });
-    const cdn = r.headers.get("location");
-
-    if (!cdn) {
-      return res.status(500).send("Failed to generate CDN URL");
-    }
-
-    res.redirect(cdn);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error contacting Google Drive");
-  }
+  res.redirect(driveUrl);
 });
 
 app.listen(PORT, () => {
-  console.log(`ClusterHub running on http://202.61.196.127:${PORT}`);
+  console.log(`ClusterHub running on ${BASE_URL}`);
 });
