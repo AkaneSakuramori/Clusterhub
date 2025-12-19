@@ -1,12 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Download</title>
+  <title>ClusterHub | Download</title>
   <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<pre id="box">Loading...</pre>
+<div class="card">
+  <h2 id="title">Loading...</h2>
+
+  <div class="meta">
+    <div><b>Format:</b> MKV</div>
+    <div><b>Size:</b> <span id="size">—</span></div>
+  </div>
+
+  <a id="downloadBtn" class="btn instant" href="#">⬇ INSTANT DL</a>
+
+  <div class="note">
+    Uses Google Drive direct delivery.<br>
+    If download fails, retry after a few seconds.
+  </div>
+</div>
 
 <script>
 const id = new URLSearchParams(location.search).get("id");
@@ -15,18 +30,14 @@ fetch("/api/file/" + id)
   .then(r => r.json())
   .then(f => {
     if (!f) {
-      box.textContent = "File not found";
+      document.body.innerHTML = "<h3>File not found</h3>";
       return;
     }
 
-    box.innerHTML =
-`┎ 📚 Title :- ${f.title}
-┃
-┠ 💾 Size :- ${f.size || "N/A"}
-┃
-┖ 📥 Download :- http://202.61.196.127:3000/download/${f.id}
-
-━━━━━━━✦✗✦━━━━━━━`;
+    document.getElementById("title").textContent = f.title;
+    document.getElementById("size").textContent = f.size || "N/A";
+    document.getElementById("downloadBtn").href =
+      "http://202.61.196.127:3000/download/" + f.id;
   });
 </script>
 
