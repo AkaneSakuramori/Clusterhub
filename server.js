@@ -1,7 +1,6 @@
 import express from "express";
 import fs from "fs";
 import { v4 as uuid } from "uuid";
-import fetch from "node-fetch";
 
 const app = express();
 const PORT = 3000;
@@ -20,7 +19,7 @@ function saveDB(data) {
   fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 }
 
-/* Add file (store only metadata + Drive fileId) */
+/* Add file */
 app.post("/api/add", (req, res) => {
   const { title, size, fileId } = req.body;
   if (!title || !fileId) {
@@ -42,13 +41,13 @@ app.post("/api/add", (req, res) => {
   res.json({ page: `/file.html?id=${id}` });
 });
 
-/* Get file metadata */
+/* Get metadata */
 app.get("/api/file/:id", (req, res) => {
   const db = loadDB();
   res.json(db[req.params.id] || null);
 });
 
-/* 🔥 Generate fresh CDN URL EVERY click */
+/* 🔥 Generate fresh Google CDN URL every click */
 app.get("/download/:id", async (req, res) => {
   const db = loadDB();
   const file = db[req.params.id];
@@ -65,7 +64,8 @@ app.get("/download/:id", async (req, res) => {
     }
 
     res.redirect(cdn);
-  } catch (e) {
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Error contacting Google Drive");
   }
 });
