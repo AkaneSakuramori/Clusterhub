@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Download</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<pre id="box">Loading...</pre>
+
+<script>
+const id = new URLSearchParams(location.search).get("id");
+
+fetch("/api/file/" + id)
+  .then(r => r.json())
+  .then(f => {
+    if (!f) {
+      box.textContent = "File not found";
+      return;
+    }
+
+    box.innerHTML =
+`┎ 📚 Title :- ${f.title}
+┃
+┠ 💾 Size :- ${f.size || "N/A"}
+┃
+┖ 📥 Download :- ${f.cdn}
+
+━━━━━━━✦✗✦━━━━━━━`;
+  });
+</script>
+
+</body>
+</html>
